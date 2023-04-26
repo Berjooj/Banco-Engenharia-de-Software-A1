@@ -9,6 +9,10 @@ public class Banco {
 
     private Map<Integer, Map<Integer, ContaCorrente>> contas;
 
+    public Banco() {
+        this.contas = new HashMap<Integer, Map<Integer, ContaCorrente>>();
+    }
+
     public Banco(String nome, int bacen) {
         this.nome = nome;
         this.bacen = bacen;
@@ -21,7 +25,7 @@ public class Banco {
                 Map<Integer, ContaCorrente> contaAgencia = this.contas.get(conta.getAgencia());
 
                 if (conta.getNumero() == 0) {
-                    conta.setNumero(contaAgencia.size());
+                    conta.setNumero(contaAgencia.size() + 1);
                 } else if (contaAgencia.containsKey(conta.getNumero())) {
                     return false;
                 }

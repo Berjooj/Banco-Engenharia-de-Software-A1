@@ -79,10 +79,10 @@ public class ATM {
         ContaCorrente conta = OperacaoBanco.getInstance().getContaOperacao();
 
         System.out.println("-----------------------------");
-        System.out.println("|                           |");
-        System.out.println("| Agencia: " + String.format("%-17d", conta.getAgencia()) + "|");
-        System.out.println("| Numero: " + String.format("%-18d", conta.getNumero()) + "|");
-        System.out.println("| Saldo: R$" + String.format("%-17.2f", conta.getSaldo()) + "|");
+        System.out.println("| Ola, " + conta.getCliente().getNome() + "         |");
+        System.out.println("| Ag/Num: " + String.format("%03d", conta.getAgencia()) + "/"
+                + String.format("%03d", conta.getNumero()) + "           |");
+        System.out.println("| Saldo: R$" + String.format("%-17.2f", conta.getSaldo()) + " |");
         System.out.println("|                           |");
         System.out.println("| 1 - Depositar             |");
         System.out.println("| 2 - Sacar                 |");

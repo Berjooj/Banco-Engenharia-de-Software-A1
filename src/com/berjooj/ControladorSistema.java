@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import com.berjooj.model.Banco;
-import com.berjooj.model.ContaCorrente;
 import com.berjooj.repositorio.RepositorioBanco;
 import com.berjooj.repositorio.RepositorioPessoa;
+import com.google.gson.Gson;
 
 public class ControladorSistema {
 
@@ -18,12 +18,16 @@ public class ControladorSistema {
     private RepositorioBanco repoBanco;
     private RepositorioPessoa repoCliente;
 
+    public static Gson gson;
+
     public void init(int bacenBanco) {
         this.repoBanco = RepositorioBanco.getInstance();
         this.repoCliente = RepositorioPessoa.getInstance();
 
-        this.carregaClientes();
+        ControladorSistema.gson = new Gson();
+
         this.carregaBancos();
+        System.exit(10);
         this.carregaContas();
 
         this.atm = ATM.getInstance(bacenBanco);
@@ -119,13 +123,8 @@ public class ControladorSistema {
         System.exit(status);
     }
 
-    private void carregaClientes() {
-    }
-
     private void carregaBancos() {
-        for (int i = 0; i < 10; i++) {
-            this.repoBanco.addBanco(new Banco("Banco " + i, i));
-        }
+        this.repoBanco.montarRepositorio();
     }
 
     private void carregaContas() {

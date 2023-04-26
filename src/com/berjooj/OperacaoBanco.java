@@ -255,7 +255,7 @@ public class OperacaoBanco {
             System.out.print("Digite o valor a ser transferido: ");
             valor = Double.parseDouble(ControladorSistema.bf.readLine());
 
-            if (this.contaOperacao.transferir(valor, this.contaOperacao)) {
+            if (this.contaOperacao.transferir(valor, contaDestino)) {
                 System.out.println("Transferência realizada com sucesso!");
                 System.out.println("Pressione ENTER para continuar...");
                 ControladorSistema.bf.readLine();
