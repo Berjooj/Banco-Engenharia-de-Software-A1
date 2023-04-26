@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.berjooj.dao.BancoDAO;
 import com.berjooj.model.Banco;
 import com.berjooj.repositorio.RepositorioBanco;
 import com.berjooj.repositorio.RepositorioPessoa;
@@ -16,19 +17,15 @@ public class ControladorSistema {
     public static final BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
 
     private RepositorioBanco repoBanco;
-    private RepositorioPessoa repoCliente;
 
     public static Gson gson;
 
     public void init(int bacenBanco) {
         this.repoBanco = RepositorioBanco.getInstance();
-        this.repoCliente = RepositorioPessoa.getInstance();
 
         ControladorSistema.gson = new Gson();
 
         this.carregaBancos();
-        System.exit(10);
-        this.carregaContas();
 
         this.atm = ATM.getInstance(bacenBanco);
         this.operacaoBanco = OperacaoBanco.getInstance();
@@ -72,7 +69,7 @@ public class ControladorSistema {
                 this.operacaoBanco.transferir();
                 break;
             case 4:
-            this.operacaoBanco.extrato();
+                this.operacaoBanco.extrato();
                 break;
             case 5:
                 System.out.println("Até breve, volte sempre!");
@@ -83,6 +80,8 @@ public class ControladorSistema {
                 break;
             default:
                 System.out.println("Opção inválida!");
+                System.out.println("Pressione ENTER para continuar...");
+                ControladorSistema.bf.readLine();
                 break;
         }
     }
@@ -105,28 +104,33 @@ public class ControladorSistema {
                             "Bem vindo, " + this.operacaoBanco.getContaOperacao().getCliente().getNome() + "!");
                     System.out.println("Pressione ENTER para continuar...");
                     ControladorSistema.bf.readLine();
+                } else {
+                    System.out.println("Pressione ENTER para continuar...");
+                    ControladorSistema.bf.readLine();
                 }
 
                 break;
             case 3:
                 System.out.println("Até breve, volte sempre!");
+                System.out.println("Pressione ENTER para continuar...");
+                ControladorSistema.bf.readLine();
 
                 this.exit(0);
                 break;
             default:
                 System.out.println("Opção inválida!");
+                System.out.println("Pressione ENTER para continuar...");
+                ControladorSistema.bf.readLine();
                 break;
         }
     }
 
     private void exit(int status) {
+        this.repoBanco.exit();
         System.exit(status);
     }
 
     private void carregaBancos() {
         this.repoBanco.montarRepositorio();
-    }
-
-    private void carregaContas() {
     }
 }

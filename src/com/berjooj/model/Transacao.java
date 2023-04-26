@@ -7,6 +7,11 @@ public abstract class Transacao {
     private Date dataHora;
     private double valor;
 
+    public Transacao(Date dataHora, double valor) {
+        this.dataHora = dataHora;
+        this.valor = valor;
+    }
+
     public Transacao(double valor) {
         this.dataHora = new Date();
         this.valor = valor;

@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 import com.berjooj.ControladorSistema;
 import com.google.gson.JsonArray;

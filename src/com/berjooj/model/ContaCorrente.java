@@ -12,6 +12,15 @@ public class ContaCorrente {
     private Pessoa cliente;
     private ArrayList<Transacao> transacoes;
 
+    public ContaCorrente(double saldo, int agencia, int numero, Date dataAbertura, String senha) {
+        this.saldo = saldo;
+        this.agencia = agencia;
+        this.numero = numero;
+        this.dataAbertura = dataAbertura;
+        this.senha = senha;
+        this.transacoes = new ArrayList<Transacao>();
+    }
+
     public ContaCorrente() {
     }
 
@@ -41,12 +50,32 @@ public class ContaCorrente {
         if (this.podeSacar(valor)) {
             this.saldo -= valor;
 
-            this.transacoes.add(new Saque(valor));
+            this.transacoes.add(new Saque(-Math.abs(valor)));
 
             return true;
         }
 
         return false;
+    }
+
+    public boolean sacar(double valor, Date dataHora) {
+        if (this.podeSacar(valor)) {
+            this.saldo -= valor;
+
+            this.transacoes.add(new Saque(dataHora, -Math.abs(valor)));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean depositar(double valor, Date dataHora) {
+        this.saldo += valor;
+
+        this.transacoes.add(new Deposito(dataHora, valor));
+
+        return true;
     }
 
     public boolean depositar(double valor) {
@@ -70,8 +99,25 @@ public class ContaCorrente {
         return false;
     }
 
+    public boolean transferir(double valor, ContaCorrente contaDestino, Date dataHora) {
+        if (this.podeTransferir(valor)) {
+            this.sacar(valor);
+            contaDestino.depositar(valor, dataHora);
+
+            this.transacoes.add(new Transferencia(dataHora, valor, contaDestino));
+
+            return true;
+        }
+
+        return false;
+    }
+
     public ArrayList<Transacao> getTransacoes() {
         return this.transacoes;
+    }
+
+    public void setTransacoes(ArrayList<Transacao> transacoes) {
+        this.transacoes = transacoes;
     }
 
     public double getSaldo() {

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.berjooj.ControladorSistema;
 import com.berjooj.dao.BancoDAO;
-import com.berjooj.dao.ConectorDAO;
 import com.berjooj.model.Banco;
 
 public class RepositorioBanco {
@@ -13,7 +12,7 @@ public class RepositorioBanco {
 
     private static RepositorioBanco instance;
 
-    private ConectorDAO bancoDAO;
+    private BancoDAO bancoDAO;
 
     private RepositorioBanco() {
         this.bancos = new ArrayList<Banco>();
@@ -33,15 +32,7 @@ public class RepositorioBanco {
     }
 
     public void montarRepositorio() {
-        for (int i = 0; i < 10; i++) {
-            this.addBanco(new Banco("Banco " + i, i));
-        }
-
         this.bancoDAO.montarRepositorio();
-        System.out.println(ControladorSistema.gson.toJson(this.bancos.get(0)));
-        System.exit(99);
-
-        System.out.println(ControladorSistema.gson.toJson(this.bancos));
     }
 
     public Banco getBanco(int bacen) {
@@ -52,5 +43,9 @@ public class RepositorioBanco {
         }
 
         return null;
+    }
+
+    public void exit() {
+        this.bancoDAO.atualizarArquivo(ControladorSistema.gson.toJson(this.bancos));
     }
 }

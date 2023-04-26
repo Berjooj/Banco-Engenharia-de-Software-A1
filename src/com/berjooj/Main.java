@@ -2,8 +2,6 @@ package com.berjooj;
 
 import java.io.IOException;
 
-import com.google.gson.Gson;
-
 public class Main {
 
     public static ControladorSistema controladorSistema;

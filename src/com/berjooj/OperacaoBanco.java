@@ -70,6 +70,11 @@ public class OperacaoBanco {
                 pessoaExiste = true;
             }
 
+            if (tipoPessoa != 1) {
+                System.out.print("Informe o nome fantasia: ");
+                ((PessoaJuridica) pessoa).setNomeFantasia(ControladorSistema.bf.readLine());
+            }
+
             System.out.print("Informe " + (tipoPessoa == 1 ? "seu nome" : "a razão social") + ": ");
             pessoa.setNome(ControladorSistema.bf.readLine());
 
