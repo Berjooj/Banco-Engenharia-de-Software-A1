@@ -26,7 +26,6 @@ public class ControladorSistema {
         ControladorSistema.gson = new Gson();
 
         this.carregaBancos();
-
         this.atm = ATM.getInstance(bacenBanco);
         this.operacaoBanco = OperacaoBanco.getInstance();
     }

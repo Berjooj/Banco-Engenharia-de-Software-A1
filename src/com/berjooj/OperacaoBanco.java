@@ -132,6 +132,7 @@ public class OperacaoBanco {
     }
 
     public void actionLogout() {
+        this.contaOperacao = new ContaCorrente();
         this.contaOperacao = null;
     }
 

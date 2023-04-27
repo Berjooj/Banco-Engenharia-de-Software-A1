@@ -3,17 +3,21 @@ package com.berjooj.dao;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import com.berjooj.ControladorSistema;
-import com.google.gson.JsonArray;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 public abstract class ConectorDAO {
     protected String caminhoArquivo;
     protected String nomeArquivo;
 
-    protected JsonArray json;
+    protected ArrayList<JsonObject> json;
 
     public ConectorDAO() {
     }
@@ -33,7 +37,13 @@ public abstract class ConectorDAO {
             if (conteudo.isEmpty()) {
                 this.json = null;
             } else {
-                this.json = ControladorSistema.gson.fromJson(conteudo, JsonArray.class);
+                if (ControladorSistema.gson == null) {
+                    ControladorSistema.gson = new Gson();
+                }
+
+                Type type = new TypeToken<ArrayList<JsonObject>>() {}.getType();
+
+                this.json = ControladorSistema.gson.fromJson(conteudo, type);
             }
 
         } catch (Exception e) {

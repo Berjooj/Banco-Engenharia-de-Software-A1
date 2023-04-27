@@ -88,4 +88,8 @@ public class Banco {
         this.bacen = bacen;
     }
 
+    @Override
+    public String toString() {
+        return "{" + " nome='" + getNome() + "'" + ", bacen='" + getBacen() + "'" + "}";
+    }
 }

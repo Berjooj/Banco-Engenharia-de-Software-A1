@@ -3,16 +3,12 @@ package com.berjooj.dao;
 import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 
 import com.berjooj.model.Banco;
 import com.berjooj.model.ContaCorrente;
-import com.berjooj.model.Deposito;
 import com.berjooj.model.Pessoa;
 import com.berjooj.model.PessoaFisica;
 import com.berjooj.model.PessoaJuridica;
-import com.berjooj.model.Transacao;
-import com.berjooj.model.Transferencia;
 import com.berjooj.repositorio.RepositorioBanco;
 import com.berjooj.repositorio.RepositorioPessoa;
 import com.google.gson.JsonArray;
@@ -40,74 +36,93 @@ public class BancoDAO extends ConectorDAO {
                 banco.setNome(this.json.get(i).getAsJsonObject().get("nome").getAsString());
 
                 // Verifica se existe contas para o banco
-                JsonArray contas = this.json.get(i).getAsJsonObject().get("contas").getAsJsonArray();
+                JsonObject contas = this.json.get(i).getAsJsonObject().get("contas").getAsJsonObject().get("1")
+                        .getAsJsonObject();
 
-                if (contas != null && contas.size() != 0) {
-                    for (int j = 0; j < contas.size(); j++) {
-                        JsonObject pessoaJSON = contas.get(j).getAsJsonObject().get("cliente").getAsJsonObject();
+                for (String key : contas.keySet()) {
+                    JsonObject pessoaJSON = contas.get(key).getAsJsonObject().get("cliente").getAsJsonObject();
 
-                        Pessoa pessoa;
+                    Pessoa pessoa;
 
-                        if (pessoaJSON.has("nomeFantasia")) {
-                            pessoa = (PessoaJuridica) repositorioCliente
-                                    .getPessoa(pessoaJSON.get("documento").getAsString());
+                    if (pessoaJSON.has("nomeFantasia")) {
+                        pessoa = (PessoaJuridica) repositorioCliente
+                                .getPessoa(pessoaJSON.get("documento").getAsString());
 
-                            if (pessoa == null) {
-                                pessoa = new PessoaJuridica();
-                                pessoa.setNome(pessoaJSON.get("nome").getAsString());
-                                pessoa.setDocumento(pessoaJSON.get("documento").getAsString());
-                                pessoa.setEmail(pessoaJSON.get("email").getAsString());
-                                pessoa.setTelefone(pessoaJSON.get("telefone").getAsString());
-                                pessoa.setEndereco(pessoaJSON.get("endereco").getAsString());
-                                ((PessoaJuridica) pessoa).setNomeFantasia(pessoaJSON.get("nomeFantasia").getAsString());
+                        if (pessoa == null) {
+                            pessoa = new PessoaJuridica();
+                            pessoa.setNome(pessoaJSON.get("nome").getAsString());
+                            pessoa.setDocumento(pessoaJSON.get("documento").getAsString());
+                            pessoa.setEmail(pessoaJSON.get("email").getAsString());
+                            pessoa.setTelefone(pessoaJSON.get("telefone").getAsString());
+                            pessoa.setEndereco(pessoaJSON.get("endereco").getAsString());
+                            ((PessoaJuridica) pessoa).setNomeFantasia(pessoaJSON.get("nomeFantasia").getAsString());
 
-                                repositorioCliente.addPessoa(pessoa);
-                            }
-                        } else {
-                            pessoa = (PessoaFisica) repositorioCliente
-                                    .getPessoa(pessoaJSON.get("documento").getAsString());
-
-                            if (pessoa == null) {
-                                pessoa = new PessoaFisica();
-                                pessoa.setNome(pessoaJSON.get("nome").getAsString());
-                                pessoa.setDocumento(pessoaJSON.get("documento").getAsString());
-                                pessoa.setEmail(pessoaJSON.get("email").getAsString());
-                                pessoa.setTelefone(pessoaJSON.get("telefone").getAsString());
-                                pessoa.setEndereco(pessoaJSON.get("endereco").getAsString());
-
-                                repositorioCliente.addPessoa(pessoa);
-                            }
+                            repositorioCliente.addPessoa(pessoa);
                         }
+                    } else {
+                        pessoa = (PessoaFisica) repositorioCliente
+                                .getPessoa(pessoaJSON.get("documento").getAsString());
 
-                        ContaCorrente conta = new ContaCorrente(
-                                contas.get(j).getAsJsonObject().get("senha").getAsString(), pessoa);
+                        if (pessoa == null) {
+                            pessoa = new PessoaFisica();
+                            pessoa.setNome(pessoaJSON.get("nome").getAsString());
+                            pessoa.setDocumento(pessoaJSON.get("documento").getAsString());
+                            pessoa.setEmail(pessoaJSON.get("email").getAsString());
+                            pessoa.setTelefone(pessoaJSON.get("telefone").getAsString());
+                            pessoa.setEndereco(pessoaJSON.get("endereco").getAsString());
 
-                        conta.setSaldo(contas.get(j).getAsJsonObject().get("saldo").getAsDouble());
+                            repositorioCliente.addPessoa(pessoa);
+                        }
                     }
 
-                    if (repositorio.getBanco(banco.getBacen()) == null) {
-                        repositorio.addBanco(banco);
+                    ContaCorrente conta = new ContaCorrente(
+                            contas.get(key).getAsJsonObject().get("senha").getAsString(),
+                            pessoa);
+
+                    conta.setSaldo(contas.get(key).getAsJsonObject().get("saldo").getAsDouble());
+
+                    if (contas.get(key).getAsJsonObject().get("dataCriacao") != null) {
+                        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH24:mm:ss");
+
+                        try {
+                            Date dataCriacao = formato
+                                    .parse(contas.get(key).getAsJsonObject().get("dataCriacao").getAsString());
+
+                            conta.setDataAbertura(dataCriacao);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
+
+                    banco.adicionarConta(conta);
+                }
+
+                if (repositorio.getBanco(banco.getBacen()) == null) {
+                    repositorio.addBanco(banco);
                 }
             }
+
             // Verifica se existe transacoes para o banco
             for (int i = 0; i < this.json.size(); i++) {
                 Banco banco = repositorio.getBanco(this.json.get(i).getAsJsonObject().get("bacen").getAsInt());
 
-                JsonArray contas = this.json.get(i).getAsJsonObject().get("contas").getAsJsonArray();
+                JsonObject contas = this.json.get(i).getAsJsonObject().get("contas").getAsJsonObject().get("1")
+                        .getAsJsonObject();
 
-                if (contas != null && contas.size() > 1) {
-                    ContaCorrente conta = banco.getConta(contas.get(0).getAsJsonObject().get("agencia").getAsInt(),
-                            contas.get(0).getAsJsonObject().get("numero").getAsInt());
+                for (String key : contas.keySet()) {
+                    ContaCorrente conta = banco.getConta(
+                            contas.get(key).getAsJsonObject().get("agencia").getAsInt(),
+                            contas.get(key).getAsJsonObject().get("numero").getAsInt());
 
                     if (conta != null) {
-                        JsonArray transacoes = contas.get(0).getAsJsonObject().get("transacoes").getAsJsonArray();
+                        JsonArray transacoes = contas.get(key).getAsJsonObject().get("transacoes").getAsJsonArray();
 
                         if (transacoes != null && transacoes.size() > 0) {
                             for (int j = 0; j < transacoes.size(); j++) {
                                 double valor = transacoes.get(i).getAsJsonObject().get("valor").getAsDouble();
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
-                                String dateString = transacoes.get(i).getAsJsonObject().get("dataHora").getAsString();
+                                String dateString = transacoes.get(i).getAsJsonObject().get("dataHora")
+                                        .getAsString();
                                 Date date = new Date();
 
                                 try {
@@ -121,15 +136,13 @@ public class BancoDAO extends ConectorDAO {
                                     // todo
                                 } else if (valor > 0) {
                                     conta.depositar(valor, date);
-                                }
-                                else {
+                                } else {
                                     conta.sacar(valor, date);
                                 }
                             }
                         }
                     }
                 }
-
             }
         } else {
             this.seedDatabase();
