@@ -32,7 +32,7 @@ Para rodar o código execute (Windows):
 ### <b>Obs</b>
 * resources/bancos.json contém um carga de dados inicial
     * Todas as agências são 1
-    * Número de contas de 1 a 5
+    * Número de contas de 0 a 4
     * Senha padrão 123
 
 <b>Bernardo Moreira, 2023</b>
