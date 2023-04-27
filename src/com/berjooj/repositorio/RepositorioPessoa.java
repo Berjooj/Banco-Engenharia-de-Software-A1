@@ -21,9 +21,6 @@ public class RepositorioPessoa {
         return instance;
     }
 
-    public void carregarPessoas() {
-    }
-
     public void addPessoa(Pessoa pessoa) {
         this.pessoas.add(pessoa);
     }

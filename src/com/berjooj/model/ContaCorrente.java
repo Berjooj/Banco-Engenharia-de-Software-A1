@@ -88,7 +88,7 @@ public class ContaCorrente {
 
     public boolean transferir(double valor, ContaCorrente contaDestino) {
         if (this.podeTransferir(valor)) {
-            this.sacar(valor);
+            this.setSaldo(this.getSaldo() - Math.abs(valor));
             contaDestino.depositar(valor);
 
             this.transacoes.add(new Transferencia(valor, contaDestino));

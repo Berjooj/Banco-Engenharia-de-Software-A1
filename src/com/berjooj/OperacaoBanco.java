@@ -273,6 +273,11 @@ public class OperacaoBanco {
             ControladorSistema.bf.readLine();
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
+            try {
+                ControladorSistema.bf.readLine();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 

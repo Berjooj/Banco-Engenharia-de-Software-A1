@@ -1,14 +1,19 @@
 package com.berjooj.dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import com.berjooj.model.Banco;
 import com.berjooj.model.ContaCorrente;
+import com.berjooj.model.Deposito;
 import com.berjooj.model.Pessoa;
 import com.berjooj.model.PessoaFisica;
 import com.berjooj.model.PessoaJuridica;
+import com.berjooj.model.Saque;
+import com.berjooj.model.Transacao;
+import com.berjooj.model.Transferencia;
 import com.berjooj.repositorio.RepositorioBanco;
 import com.berjooj.repositorio.RepositorioPessoa;
 import com.google.gson.JsonArray;
@@ -35,6 +40,12 @@ public class BancoDAO extends ConectorDAO {
                 banco.setBacen(this.json.get(i).getAsJsonObject().get("bacen").getAsInt());
                 banco.setNome(this.json.get(i).getAsJsonObject().get("nome").getAsString());
 
+                if (repositorio.getBanco(banco.getBacen()) == null) {
+                    repositorio.addBanco(banco);
+                } else {
+                    banco = repositorio.getBanco(banco.getBacen());
+                }
+
                 // Verifica se existe contas para o banco
                 JsonObject contas = this.json.get(i).getAsJsonObject().get("contas").getAsJsonObject().get("1")
                         .getAsJsonObject();
@@ -56,8 +67,6 @@ public class BancoDAO extends ConectorDAO {
                             pessoa.setTelefone(pessoaJSON.get("telefone").getAsString());
                             pessoa.setEndereco(pessoaJSON.get("endereco").getAsString());
                             ((PessoaJuridica) pessoa).setNomeFantasia(pessoaJSON.get("nomeFantasia").getAsString());
-
-                            repositorioCliente.addPessoa(pessoa);
                         }
                     } else {
                         pessoa = (PessoaFisica) repositorioCliente
@@ -70,9 +79,13 @@ public class BancoDAO extends ConectorDAO {
                             pessoa.setEmail(pessoaJSON.get("email").getAsString());
                             pessoa.setTelefone(pessoaJSON.get("telefone").getAsString());
                             pessoa.setEndereco(pessoaJSON.get("endereco").getAsString());
-
-                            repositorioCliente.addPessoa(pessoa);
                         }
+                    }
+
+                    if (repositorioCliente.getPessoa(pessoa.getDocumento()) == null) {
+                        repositorioCliente.addPessoa(pessoa);
+                    } else {
+                        pessoa = repositorioCliente.getPessoa(pessoa.getDocumento());
                     }
 
                     ContaCorrente conta = new ContaCorrente(
@@ -96,10 +109,6 @@ public class BancoDAO extends ConectorDAO {
 
                     banco.adicionarConta(conta);
                 }
-
-                if (repositorio.getBanco(banco.getBacen()) == null) {
-                    repositorio.addBanco(banco);
-                }
             }
 
             // Verifica se existe transacoes para o banco
@@ -118,10 +127,14 @@ public class BancoDAO extends ConectorDAO {
                         JsonArray transacoes = contas.get(key).getAsJsonObject().get("transacoes").getAsJsonArray();
 
                         if (transacoes != null && transacoes.size() > 0) {
+                            ArrayList<Transacao> transacoesLista = new ArrayList<Transacao>();
+
                             for (int j = 0; j < transacoes.size(); j++) {
-                                double valor = transacoes.get(i).getAsJsonObject().get("valor").getAsDouble();
+                                double valor = transacoes.get(j).getAsJsonObject().get("valor").getAsDouble();
+
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
-                                String dateString = transacoes.get(i).getAsJsonObject().get("dataHora")
+
+                                String dateString = transacoes.get(j).getAsJsonObject().get("dataHora")
                                         .getAsString();
                                 Date date = new Date();
 
@@ -132,14 +145,24 @@ public class BancoDAO extends ConectorDAO {
                                     // Não faz nada
                                 }
 
-                                if (transacoes.get(i).getAsJsonObject().has("transferenia")) {
-                                    // todo
+                                if (transacoes.get(j).getAsJsonObject().has("contaDestino")) {
+                                    JsonObject contaTempJSON = transacoes.get(j).getAsJsonObject().get("contaDestino")
+                                            .getAsJsonObject();
+
+                                    ContaCorrente contaCorrenteTemp = new ContaCorrente(
+                                            contaTempJSON.get("senha").getAsString(),
+                                            repositorioCliente.getPessoa(contaTempJSON.get("cliente").getAsJsonObject()
+                                                    .get("documento").getAsString()));
+
+                                    transacoesLista.add(new Transferencia(date, valor, contaCorrenteTemp));
                                 } else if (valor > 0) {
-                                    conta.depositar(valor, date);
+                                    transacoesLista.add(new Deposito(date, valor));
                                 } else {
-                                    conta.sacar(valor, date);
+                                    transacoesLista.add(new Saque(date, valor));
                                 }
                             }
+
+                            conta.setTransacoes(transacoesLista);
                         }
                     }
                 }

@@ -4,10 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.berjooj.dao.BancoDAO;
-import com.berjooj.model.Banco;
 import com.berjooj.repositorio.RepositorioBanco;
-import com.berjooj.repositorio.RepositorioPessoa;
 import com.google.gson.Gson;
 
 public class ControladorSistema {
@@ -37,11 +34,20 @@ public class ControladorSistema {
             System.out.println("Pressione ENTER para continuar...");
             ControladorSistema.bf.readLine();
 
+            int opcao = -1;
+
             do {
                 this.atm.telaOpcoes(this.operacaoBanco.isLogado());
 
                 System.out.print("Escolha uma opção: ");
-                int opcao = Integer.parseInt(ControladorSistema.bf.readLine());
+                try {
+                    opcao = Integer.parseInt(ControladorSistema.bf.readLine());
+                } catch (NumberFormatException e) {
+                    System.out.println("Opção inválida!");
+                    System.out.println("Pressione ENTER para continuar...");
+                    ControladorSistema.bf.readLine();
+                    continue;
+                }
 
                 if (this.operacaoBanco.isLogado()) {
                     this.handleOpcoesComLogin(opcao);
@@ -50,8 +56,8 @@ public class ControladorSistema {
                 }
             } while (true);
 
-        } catch (IOException e) {
-            System.out.println("Erro: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Erro: ocorreu um erro inesperado!");
             this.exit(-1);
         }
     }

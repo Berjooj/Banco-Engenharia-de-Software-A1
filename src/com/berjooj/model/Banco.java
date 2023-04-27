@@ -25,7 +25,7 @@ public class Banco {
                 Map<Integer, ContaCorrente> contaAgencia = this.contas.get(conta.getAgencia());
 
                 if (conta.getNumero() == 0) {
-                    conta.setNumero(contaAgencia.size() + 1);
+                    conta.setNumero(contaAgencia.size());
                 } else if (contaAgencia.containsKey(conta.getNumero())) {
                     return false;
                 }

@@ -1,6 +1,7 @@
 package com.berjooj;
 
 import com.berjooj.model.ContaCorrente;
+import com.berjooj.model.PessoaFisica;
 
 public class ATM {
 
@@ -78,19 +79,28 @@ public class ATM {
     private void telaOpcoesLogado() {
         ContaCorrente conta = OperacaoBanco.getInstance().getContaOperacao();
 
-        System.out.println("-----------------------------");
-        System.out.println("| Ola, " + conta.getCliente().getNome() + "         |");
-        System.out.println("| Ag/Num: " + String.format("%03d", conta.getAgencia()) + "/"
-                + String.format("%03d", conta.getNumero()) + "           |");
-        System.out.println("| Saldo: R$" + String.format("%-17.2f", conta.getSaldo()) + " |");
-        System.out.println("|                           |");
-        System.out.println("| 1 - Depositar             |");
-        System.out.println("| 2 - Sacar                 |");
-        System.out.println("| 3 - Transferir            |");
-        System.out.println("| 4 - Extrato               |");
-        System.out.println("| 5 - Sair                  |");
-        System.out.println("|                           |");
-        System.out.println("-----------------------------");
+        System.out.println("--------------------------------------------------------------------------------------");
+        System.out.println("| Ola, " + conta.getCliente().getNome() + "!");
+
+        if (conta.getCliente() instanceof PessoaFisica) {
+            System.out.println("| Temos os melhores juros do mercado para voce!");
+        } else {
+            System.out.println("| Temos os melhores juros do mercado sua empresa!");
+        }
+
+        System.out.println("|                           ");
+        System.out.println("| Ag/Num-Banco: " + String.format("%02d", conta.getAgencia()) + "/"
+                + String.format("%04d", conta.getNumero())
+                + "-" + String.format("%02d", this.getBacen()));
+        System.out.println("| Saldo: R$" + String.format("%-17.2f", conta.getSaldo()));
+        System.out.println("|                                                                                    |");
+        System.out.println("| 1 - Depositar                                                                      |");
+        System.out.println("| 2 - Sacar                                                                          |");
+        System.out.println("| 3 - Transferir                                                                     |");
+        System.out.println("| 4 - Extrato                                                                        |");
+        System.out.println("| 5 - Sair                                                                           |");
+        System.out.println("|                                                                                    |");
+        System.out.println("--------------------------------------------------------------------------------------");
 
     }
 
